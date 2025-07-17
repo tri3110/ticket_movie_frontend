@@ -1,0 +1,15 @@
+# Debug frontend
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Next.js App",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "console": "integratedTerminal"
+    }
+  ]
+}

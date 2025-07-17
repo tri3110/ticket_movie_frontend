@@ -1,0 +1,23 @@
+{
+  "greeting": "Hello",
+  "login": "Login",
+  "register": "Register",
+  "password": "Password",
+  "Home": "Home",
+  "Language": "Language",
+  "Logout": "Logout",
+  "Film": "Film",
+  "Hi": "Hi",
+  "Search...": "Search...",
+  "Cinema": "Cinema",
+  "English": "English",
+  "Vietnamese": "Vietnamese",
+  "Japanese": "Japanese",
+  "Now Showing": "Now Showing",
+  "Coming Soon": "Coming Soon",
+  "Full name": "Full name",
+  "Confirm Password": "Confirm Password",
+  "Forgot Password?": "Forgot Password?",
+  "SignOut": "SignOut",
+  "Profile": "Profile"
+}

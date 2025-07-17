@@ -1,0 +1,23 @@
+{
+  "greeting": "Hello",
+  "login": "Đăng nhập",
+  "register": "Đăng ký",
+  "password": "Mật khẩu",
+  "Home": "Trang chủ",
+  "Language": "Ngôn ngữ",
+  "Logout": "Đăng xuất",
+  "Film": "Phim",
+  "Hi": "Chào",
+  "Search...": "Tìm kiếm...",
+  "Cinema": "Rạp",
+  "English": "Tiếng Anh",
+  "Vietnamese": "Tiếng Việt",
+  "Japanese": "Tiếng Nhật",
+  "Now Showing": "Phim đang chiếu",
+  "Coming Soon": "Phim sắp chiếu",
+  "Full name": "Họ và tên",
+  "Confirm Password": "Xác nhận mật khẩu",
+  "Forgot Password?": "Tìm lại mật khẩu?",
+  "SignOut": "Đăng xuất",
+  "Profile": "Thông tin các nhân"
+}
