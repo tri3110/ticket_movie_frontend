@@ -9,6 +9,10 @@ import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react"
 import { sendRequest } from '@/utils/api';
 import { useTranslation } from 'react-i18next';
+import useSWR from 'swr';
+import { useDataStore } from '@/utils/store';
+import AppSearch from './app.search';
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Header = () => {
     const { data: session } = useSession()
@@ -17,6 +21,7 @@ const Header = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const { setData } = useDataStore();
     const handleLogin = (name:string) =>{
         if(name == ""){
             router.push("/login");
@@ -25,6 +30,17 @@ const Header = () => {
             setMenuOpen(!menuOpen);
         }
     }
+
+    const { data, error, isLoading } = useSWR(
+        "http://127.0.0.1:8000/app/api/main/data/", 
+        fetcher,
+        {
+            revalidateIfStale: false,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+            onSuccess: (data) => setData(data),
+        }
+    )
 
     const handleLogout = async () =>{
         try {
@@ -80,16 +96,7 @@ const Header = () => {
                         </nav>
                     </div>
                     <div className="flex items-center gap-1">
-                        <div className="hidden md:flex items-center border-1 border-gray-400 rounded-md overflow-hidden bg-white dark:bg-gray-800">
-                            <input
-                                type="text"
-                                placeholder={t("Search...")}
-                                className="px-3 py-1 text-sm text-gray-800 dark:text-white bg-transparent outline-none"
-                            />
-                            <button className="px-3 py-1 bg-blue-500 text-white text-sm hover:bg-blue-600">
-                                <MagnifyingGlassIcon className="h-5 w-5 text-white" />
-                            </button>
-                        </div>
+                        <AppSearch/>
                         <div className="hidden md:flex gap-6">
                             <LanguageDropdown />
                         </div>

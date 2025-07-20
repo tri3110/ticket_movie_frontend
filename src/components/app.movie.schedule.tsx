@@ -1,37 +1,193 @@
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
-import { ChevronDownIcon, MapPinIcon } from "@heroicons/react/20/solid"
+import { ChevronDownIcon, MagnifyingGlassIcon, MapPinIcon } from "@heroicons/react/20/solid"
+import { useTranslation } from "react-i18next";
+import { useDataStore } from "@/utils/store";
+import dayjs from 'dayjs';
+import SeatDialog from "./app.seat.dialog";
 
-interface Person
-{
+type City = {
     id: number; 
-    name: string 
+    name: string;
+    country: string;
 }
 
-const people = [
-  { id: 1, name: 'Durward Reynolds' },
-  { id: 2, name: 'Kenton Towne' },
-  { id: 3, name: 'Therese Wunsch' },
-  { id: 4, name: 'Benedict Kessler' },
-  { id: 5, name: 'Katelyn Rohan' },
-]
+interface Cinema {
+    id: number;
+    name: string;
+    address: string;
+    phone: string;
+    opening_hours: string;
+    city: number;
+}
+
+interface MovieSchedule{
+    showtime_id: number,
+    movie_id: number,
+    movie_poster_url: string,
+    movie_title: string,
+    movie_genre: string,
+    duration: string,
+    start_time: string,
+    end_time: string,
+    base_price: number,
+    screen_id: number,
+    screen_name: string,
+    screen_type: string,
+}
+
+interface SeatsScreen {
+    id: number,
+    screen_id: number,
+    row: string,
+    number: number,
+    type: string,
+    is_active: boolean,
+    seat_name: string,
+    seat_name_couple: string,
+}
+
+interface DataSeatsScreen{
+    data: (SeatsScreen | false)[][],
+    max_number: number,
+    max_row: number,
+}
 
 export default function AppMovieSchedule () {
-    const [selectedPerson, setSelectedPerson] = useState<Person | null>(people[0])
-    const [query, setQuery] = useState('')
+    const cities = useDataStore((state) => state.data?.cities ?? []);
+    const [selectedCity, setSelectedCity] = useState<City | null>(cities[0]);
+    const [valueSearch, setValueSearch] = useState("");
+    const [limit, setLimit] = useState(5);
+    const [query, setQuery] = useState('');
+    const {t} = useTranslation();
+    const { getFilteredCinemasById } = useDataStore();
 
-    const filteredPeople =
-        query === ''
-        ? people
-        : people.filter((person) => {
-            return person.name.toLowerCase().includes(query.toLowerCase())
-        })
+    const cinemas = useMemo(() => {
+        return selectedCity
+            ? getFilteredCinemasById(selectedCity.id, valueSearch, limit)
+            : [];
+        }, [selectedCity, valueSearch, limit, getFilteredCinemasById]);
+
+    const [selectedCinema, setSelectedCinema] = useState<Cinema | null>(cinemas[0]);
+
+    const filteredCity = useMemo(() => {
+        return query === ''
+            ? cities
+            : cities.filter((city) =>
+                city.name.toLowerCase().includes(query.toLowerCase())
+            );
+        }, [cities, query]);
+    
+    useEffect(() => {
+        setLimit(5);
+        setValueSearch("");
+        setSelectedCinema(cinemas.length > 0 ? cinemas[0] : null);
+    }, [selectedCity]);
+
+    const days = useMemo(() => {
+        const result = [];
+        const today = dayjs();
+
+        for (let i = 0; i < 7; i++) {
+            const date = today.add(i, 'day');
+            result.push({
+                day: date.date(),
+                weekday: i == 0 ? "To day" : date.format('dddd'),
+                fullDate: date.format('YYYY-MM-DD'), 
+            });
+        }
+
+        return result;
+    }, []);
+
+    const [selectedDay, setSelectedDay] = useState(days[0].fullDate);
+
+    const [moviesSchedule, setMoviesSchedule] = useState<MovieSchedule[]>([]);
+    useEffect(() => {
+        const fetchSchedule = async () => {
+            if (!selectedCinema || !selectedDay) return;
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/app/api/main/movies/schedule/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        cinema_id: selectedCinema.id,
+                        day: selectedDay,
+                    }),
+                });
+
+                const data = await response.json();
+                setMoviesSchedule(data);
+                console.log(data)
+            } catch (error) {
+                console.error("Failed to fetch schedule:", error);
+            }
+        };
+
+        fetchSchedule();
+    }, [selectedCinema, selectedDay]);
+
+    const getTime = (dateStr:string) => {
+        const date = new Date(dateStr);
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        return hours + ":" + minutes;
+    }
+
+    const [selectMoviesSchedule, setSelectMoviesSchedule] = useState<MovieSchedule | null>();
+    const [dataSeatsScreen, setdataSeatsScreen] = useState<DataSeatsScreen | null>();
+    useEffect(()=>{
+        if (selectMoviesSchedule){
+            const fetchScreenSeat = async () => {
+                const response = await fetch("http://127.0.0.1:8000/app/api/main/screen/seat/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        screen_id: selectMoviesSchedule.screen_id,
+                    }),
+                })
+
+                const data = await response.json();
+                setdataSeatsScreen(data);
+            }
+
+            fetchScreenSeat();
+        }
+        
+    }, [selectMoviesSchedule])
+
+    const [showSeatDialog, setShowSeatDialog] = useState(false);
+    const [showLoading, setShowLoading] = useState(false);
+
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+
+        if (selectMoviesSchedule && dataSeatsScreen) {
+            setShowLoading(true); 
+            setShowSeatDialog(false);
+
+            timer = setTimeout(() => {
+                setShowSeatDialog(true);
+                setShowLoading(false);
+            }, 200);
+        } else {
+            setShowSeatDialog(false);
+            setShowLoading(false);
+        }
+
+        return () => clearTimeout(timer);
+    }, [selectMoviesSchedule, dataSeatsScreen]);
 
     return (
-        <div className="md:shadow-soju1 rounded-lg border-gray-200 bg-white md:overflow-hidden md:border h-[500px]">
+        <div className="h-[700px] flex flex-col md:shadow-soju1 rounded-lg border-gray-200 bg-white md:overflow-hidden md:border">
             <div className="flex items-center py-3 md:px-4 gap-4 border-b border-gray-200">
-                <label className="text-sm">Vị trí</label>
-                <Combobox value={selectedPerson} onChange={setSelectedPerson}>
+                <label className="text-sm">{t("Location")}</label>
+                <Combobox value={selectedCity} onChange={setSelectedCity}>
                     <div className="relative w-60">
                         <div className="relative w-full">
                             <div className="absolute inset-y-0 left-1 flex items-center pr-2">
@@ -41,7 +197,7 @@ export default function AppMovieSchedule () {
                                 }} aria-hidden="true" />
                             </div>
                             <ComboboxInput
-                                displayValue={(person: Person | null) => person?.name ?? ''}
+                                displayValue={(city: City | null) => city?.name ?? ''}
                                 onChange={(event) => setQuery(event.target.value)}
                                 className="w-full pl-8 pr-3 py-2 pr-10 border border-red-500 rounded-md focus:outline-none "
                             />
@@ -52,20 +208,20 @@ export default function AppMovieSchedule () {
 
                         <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5">
                         {
-                            filteredPeople.length === 0 ? (
+                            filteredCity.length === 0 ? (
                                 <div className="px-3 py-2 text-gray-500">Không có kết quả</div>
                             ) : (
-                                filteredPeople.map((person) => (
+                                filteredCity.map((city) => (
                                 <ComboboxOption
-                                    key={person.id}
-                                    value={person}
+                                    key={city.id}
+                                    value={city}
                                     className={({ active }) =>
                                     `cursor-pointer px-4 py-2 ${
                                         active ? 'bg-blue-500 text-white' : ''
                                     }`
                                     }
                                 >
-                                    {person.name}
+                                    {city.name}
                                 </ComboboxOption>
                                 ))
                             )
@@ -74,6 +230,140 @@ export default function AppMovieSchedule () {
                     </div>
                 </Combobox>
             </div>
+
+            <div className="grid grid-cols-6 flex-1 overflow-hidden min-h-0">
+                <div className="col-span-2 border-r border-gray-200 flex flex-col overflow-hidden">
+                    <div className="p-2 border-b border-gray-200">
+                        <div className="relative flex items-center border border-gray-200 rounded-lg">
+                            <input
+                                type="text"
+                                value={valueSearch}
+                                placeholder={t("Enter cinema name")}
+                                className="w-full pr-10 px-3 py-2 text-sm text-gray-800 dark:text-white bg-transparent outline-none"
+                                onChange={(e)=>{
+                                    setValueSearch(e.target.value);
+                                }}
+                            />
+                            <MagnifyingGlassIcon className="absolute right-3 h-6 w-6 text-gray-600 hover:text-gray-800" />
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto">
+                        {
+                            cinemas.length === 0 ? (
+                                <p className="text-gray-400 px-4 py-2">Không có rạp nào ở thành phố này</p>
+                            ) : (
+                                    cinemas.map((cinema) => (
+                                        <div 
+                                        key={cinema.id}
+                                        onClick={() => setSelectedCinema(cinema)}
+                                        className={`
+                                            ${selectedCinema?.id == cinema.id ? "bg-blue-100 opacity-100" : ""} 
+                                            border-b border-gray-200 px-4 py-3 cursor-pointer`
+                                        }>
+                                            <h3 className="text-md">{cinema.name}</h3>
+                                            <p className="text-xs text-gray-400">☎ {cinema.phone}</p>
+                                        </div>
+                                    )
+                                )
+                            )
+                        }
+                        {
+                            cinemas.length > 0 && cinemas.length === limit &&
+                            <div className="text-center p-5">
+                                <button 
+                                    className="p-1 border border-red-600 rounded-xl text-red-600 hover:bg-red-200 cursor-pointer"
+                                    onClick={()=>setLimit(limit + 5)}
+                                    > {t("View more")}
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div className="col-span-4 flex flex-col overflow-hidden">
+                    {
+                        cinemas.length != 0 && selectedCinema && 
+                        <div className="flex flex-col flex-1 min-h-0">
+                            <div className="border-b border-gray-200">
+                                <div className="relative flex items-center">
+                                    <div className="px-4 py-3">
+                                        <h3 className="text-xl text-red-400">{t("Movie schedule") + selectedCinema.name}</h3>
+                                        <p className="flex text-ms text-gray-400">
+                                            <MapPinIcon className="w-5 h-5 text-gray-400" 
+                                            style={{
+                                                paddingTop : "2px"
+                                            }} aria-hidden="true" />
+                                            {selectedCinema.address}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-1 border-b border-gray-200">
+                                <div className="grid grid-cols-7 flex-1 overflow-hidden gap-4">
+                                    {
+                                        days.map((day)=>(
+                                            <div onClick={() => setSelectedDay(day.fullDate)} key={day.day} className={`${selectedDay == day.fullDate ? "border border-pink-600" : "border border-gray-200"} m-1 rounded-lg cursor-pointer`}>
+                                                <div className={`${selectedDay == day.fullDate ? "bg-pink-600 text-white" : "bg-gray-100"} rounded-t-[5px] mx-auto py-1 text-center text-lg font-semibold`}>
+                                                    {day.day}
+                                                </div>
+                                                <div className="mx-auto py-1 text-center text-sm">{t(day.weekday)}</div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </div>
+                            <div className="flex-1 overflow-y-auto">
+                                {
+                                    moviesSchedule.map((movieSchedule)=> (
+                                        <div key={movieSchedule.movie_id} className="grid grid-cols-1 md:grid-cols-5 gap-2 p-2 cursor-pointer border-b border-gray-200">
+                                            <div className="flex items-center">
+                                                <img
+                                                src={movieSchedule.movie_poster_url}
+                                                alt={movieSchedule.movie_title}
+                                                className="h-42 w-full object-cover rounded-md shadow-md"
+                                                />
+                                            </div>
+
+                                            <div className="md:col-span-4 space-y-2 ml-3">
+                                                <h2 className="font-semibold leading-tight text-pink-500">{movieSchedule.movie_title}</h2>
+                                                <p className="text-sm text-gray-400">{movieSchedule.movie_genre}</p>
+                                                <h2 className="pt-4 font-semibold leading-tight text-gray-700">{movieSchedule.screen_type}</h2>
+                                                <div className="pt-2 ">
+                                                    <button onClick={() => setSelectMoviesSchedule(movieSchedule)} 
+                                                    className="text-blue-600 hover:bg-blue-200 border border-blue-600 rounded-lg p-1 cursor-pointer">
+                                                        {
+                                                            getTime(movieSchedule.start_time) + " ~ " + getTime(movieSchedule.end_time)
+                                                        }
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            {showLoading && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="flex flex-col items-center space-y-2">
+                        <svg className="animate-spin h-8 w-8 text-white" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                        </svg>
+                    </div>
+                </div>
+            )}
+            {
+                showSeatDialog && selectMoviesSchedule && dataSeatsScreen && (
+                <SeatDialog
+                    movieSchedule={selectMoviesSchedule}
+                    setSelectMoviesSchedule={setSelectMoviesSchedule}
+                    dataSeatsScreen={dataSeatsScreen}
+                />
+            )}
         </div>
     )
 }

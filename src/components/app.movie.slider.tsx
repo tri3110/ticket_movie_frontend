@@ -100,9 +100,13 @@ export default function AppSlider(props: Props) {
                             <span className="py-1 text-xs text-tiny leading-tight text-gray-400">
                                 {formatDate(movie.release_date)}
                             </span>
-                            <span className="py-1 flex items-center justify-center gap-1 text-xs text-tiny leading-tight text-gray-400">
-                                <StarIcon className="h-4 w-4 text-yellow-500" /> {movie.rating}
-                            </span>
+                            {
+                                movie.rating &&
+                                <span className="py-1 flex items-center justify-center gap-1 text-xs text-tiny leading-tight text-gray-400">
+                                    <StarIcon className="h-4 w-4 text-yellow-500" /> {movie.rating}
+                                 </span>
+                            }
+                            
                         </div>
                     </div>
                 </div>
