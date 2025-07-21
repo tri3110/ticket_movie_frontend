@@ -12,47 +12,6 @@ type City = {
     country: string;
 }
 
-interface Cinema {
-    id: number;
-    name: string;
-    address: string;
-    phone: string;
-    opening_hours: string;
-    city: number;
-}
-
-interface MovieSchedule{
-    showtime_id: number,
-    movie_id: number,
-    movie_poster_url: string,
-    movie_title: string,
-    movie_genre: string,
-    duration: string,
-    start_time: string,
-    end_time: string,
-    base_price: number,
-    screen_id: number,
-    screen_name: string,
-    screen_type: string,
-}
-
-interface SeatsScreen {
-    id: number,
-    screen_id: number,
-    row: string,
-    number: number,
-    type: string,
-    is_active: boolean,
-    seat_name: string,
-    seat_name_couple: string,
-}
-
-interface DataSeatsScreen{
-    data: (SeatsScreen | false)[][],
-    max_number: number,
-    max_row: number,
-}
-
 export default function AppMovieSchedule () {
     const cities = useDataStore((state) => state.data?.cities ?? []);
     const [selectedCity, setSelectedCity] = useState<City | null>(cities[0]);
@@ -357,11 +316,12 @@ export default function AppMovieSchedule () {
                 </div>
             )}
             {
-                showSeatDialog && selectMoviesSchedule && dataSeatsScreen && (
+                showSeatDialog && selectMoviesSchedule && dataSeatsScreen && selectedCinema && (
                 <SeatDialog
                     movieSchedule={selectMoviesSchedule}
                     setSelectMoviesSchedule={setSelectMoviesSchedule}
                     dataSeatsScreen={dataSeatsScreen}
+                    cinema={selectedCinema}
                 />
             )}
         </div>
