@@ -2,30 +2,28 @@
 
 import { useState } from "react";
 import BookingDialog from "./app.booking.dialog";
+import { t } from "i18next";
+import { getTime } from "@/utils/common";
 
 interface Props {
-  setSelectMoviesSchedule: (value: MovieSchedule| null) => void;
-  movieSchedule: MovieSchedule;
+  setSelectShowtime: (value: Showtimes| null) => void;
+  movie: Movie;
   dataSeatsScreen: DataSeatsScreen;
+  selectScreen: Screens;
+  selectShowtime: Showtimes;
   cinema: Cinema;
 }
 
 
-export default function SeatDialog({movieSchedule, setSelectMoviesSchedule, dataSeatsScreen, cinema}: Props) {
+export default function SeatDialog(props: Props) {
+    const {movie, setSelectShowtime, dataSeatsScreen, cinema, selectScreen, selectShowtime} = props;
     const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
-            setSelectMoviesSchedule(null);
+            setSelectShowtime(null);
         }
     };
-
-    const getTime = (dateStr:string) => {
-        const date = new Date(dateStr);
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        return hours + ":" + minutes;
-    }
     
-    const start = new Date(movieSchedule.start_time);
+    const start = new Date(selectShowtime.start_time);
 
     const [bookingSeats, setBookingSeats] = useState<SeatsScreen[]>([]);
     const handleBookingSeat = (seat: SeatsScreen) => {
@@ -40,7 +38,7 @@ export default function SeatDialog({movieSchedule, setSelectMoviesSchedule, data
     };
 
     const totalPrice = bookingSeats.reduce((sum, seat) => {
-        const seatPrice = seat.type === "couple" ? movieSchedule.base_price * 2 : movieSchedule.base_price;
+        const seatPrice = seat.type === "couple" ? selectShowtime.base_price * 2 : selectShowtime.base_price;
         return sum + seatPrice;
     }, 0);
 
@@ -51,9 +49,9 @@ export default function SeatDialog({movieSchedule, setSelectMoviesSchedule, data
             <div className="relative w-full max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                 <div className="relative items-center p-2 md:p-3 border-b rounded-t dark:border-gray-600 border-gray-200">
                     <h3 className="text-xl w-full text-center font-semibold text-pink-600 dark:text-white">
-                        Mua Vé Xem Phim
+                        {t("Book Movie Tickets")}
                     </h3>
-                    <button onClick={() => setSelectMoviesSchedule(null)} type="button" 
+                    <button onClick={() => setSelectShowtime(null)} type="button" 
                         className="absolute top-1 right-1 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="default-modal">
                         <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                             <path stroke="currentColor" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
@@ -64,7 +62,7 @@ export default function SeatDialog({movieSchedule, setSelectMoviesSchedule, data
                     <div className="mb-3 w-full basis-full px-20 pt-3 text-center lg:mb-6 lg:px-40">
                         <div className="mx-auto mb-1 h-1 w-64 rounded-lg bg-white"></div>
                         <div className="aspect-w-16 aspect-h-9">
-                            MÀN HÌNH
+                            {t("SCREEN")}
                         </div>
                     </div>
                     <div className="p-4">
@@ -80,17 +78,21 @@ export default function SeatDialog({movieSchedule, setSelectMoviesSchedule, data
                                                     group border-none rounded-lg text-sm 
                                                     flex items-center justify-center space-x-2
                                                     ${
-                                                        !seat.is_active ? "bg-gray-500 text-black" 
+                                                        !seat.is_booking ? "bg-gray-500 text-black" 
                                                         : (
                                                             bookingSeats.some(s => s.id == seat.id) ? "cursor-pointer bg-blue-600 text-white" 
-                                                            : (seat.is_active && seat.type === "standard" 
+                                                            : (seat.is_booking && seat.type === "standard" 
                                                             ? "cursor-pointer bg-purple-700 hover:bg-purple-800 text-white " 
                                                             : "cursor-pointer bg-red-600 hover:bg-red-700 text-white ")
                                                         )
                                                     }
                                                     `
                                                 }
-                                                onClick={()=> handleBookingSeat(seat)}
+                                                onClick={()=> {
+                                                    if (!seat.is_booking)
+                                                        return;
+                                                    handleBookingSeat(seat)
+                                                }}
                                             >
                                                 <span className="w-8 h-8 flex items-center justify-center">{seat.seat_name}</span>
                                                 {
@@ -116,16 +118,16 @@ export default function SeatDialog({movieSchedule, setSelectMoviesSchedule, data
                 </div>
                 <div className="items-center gap-3 px-6 py-4 border-b border-gray-200">
                     <div className="text-lg font-semibold">
-                        {movieSchedule.movie_title}
+                        {movie.title}
                     </div>
                     <div className="text-sm text-pink-400">
-                        {getTime(movieSchedule.start_time) + " ~ " + getTime(movieSchedule.end_time) + ", " 
-                            + `Ngày ${start.getDate()}/${start.getMonth() + 1}/${start.getFullYear()} - ${movieSchedule.screen_type}`}
+                        {getTime(selectShowtime.start_time) + " ~ " + getTime(selectShowtime.end_time) + ", " 
+                            + `Ngày ${start.getDate()}/${start.getMonth() + 1}/${start.getFullYear()} - ${selectScreen.screen_type}`}
                     </div>
                 </div>
                 <div className="px-6 py-2 flex items-center justify-between space-x-3 py-1.50 border-b border-gray-200">
                     <div className="shrink-0 text-gray-500">
-                        Chỗ ngồi
+                        {t("Seat")}
                     </div>
                     <div className="flex items-center space-x-2 rounded-lg px-3 py-1 h-[50px]">
                         {
@@ -146,10 +148,10 @@ export default function SeatDialog({movieSchedule, setSelectMoviesSchedule, data
                 </div>
                 <div className="px-6 py-2 flex items-center justify-between space-x-3 py-1.50 border-b border-gray-200">
                     <div className="shrink-0 text-gray-500">
-                        Thành tiền: {new Intl.NumberFormat("vi-VN").format(totalPrice)} đ
+                        {t("Total Amount:")} {new Intl.NumberFormat("vi-VN").format(totalPrice)} đ
                     </div>
                     <div onClick={()=>setIsOpenBookingDialog(true)} className="text-white text-lg hover:bg-pink-600 rounded-lg border border-pink-500 bg-pink-500 p-2 cursor-pointer">
-                        Đặt vé
+                        {t("Book Ticket")}
                     </div>
                 </div>
             </div>
@@ -157,11 +159,13 @@ export default function SeatDialog({movieSchedule, setSelectMoviesSchedule, data
             <BookingDialog 
                 isOpen={isOpenBookingDialog} 
                 setIsOpen={setIsOpenBookingDialog}
-                movieSchedule={movieSchedule}
+                movie={movie}
                 cinema={cinema}
                 totalPrice={totalPrice}
                 bookingSeats={bookingSeats}
-                setSelectMoviesSchedule={setSelectMoviesSchedule}
+                setSelectShowtime={setSelectShowtime}
+                selectScreen={selectScreen}
+                selectShowtime={selectShowtime}
             />
         </div>
     );

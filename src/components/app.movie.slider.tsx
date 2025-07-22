@@ -5,21 +5,7 @@ import "keen-slider/keen-slider.min.css";
 import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
 import MovieDialog from "./app.movie.dialog";
-
-interface Movie {
-    id: number;
-    title: string;
-    status: string;
-    duration: number;
-    poster_url: string;
-    rating: string;
-    movie_cast: string;
-    description: string;
-    director: string;
-    genre: string;
-    release_date: string;
-    trailer_url: string;
-}
+import { useRouter } from "next/navigation";
 
 interface themeStyle {
     text: string;
@@ -31,6 +17,7 @@ interface Props {
 }
 
 export default function AppSlider(props: Props) {
+    const router = useRouter();
     const {movies, themeStyle} = props;
     const [isOpenDialog, setIsOpenDialog] = useState(false);
     const [selectedMovie, setSelectedMovie] = useState<Movie>(movies[0]);
@@ -71,9 +58,9 @@ export default function AppSlider(props: Props) {
                                 src={movie.poster_url}
                                 alt={movie.title}
                                 className="w-full h-72 object-cover cursor-pointer"
+                                onClick={()=>router.push("/detail/" + movie.id)}
                             />
                             
-                            {/* Nút Play nằm giữa ảnh */}
                             <button
                                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                                     p-3 bg-transparent border-2 border-white text-white rounded-full
@@ -88,8 +75,8 @@ export default function AppSlider(props: Props) {
                                 </svg>
                             </button>
                         </div>
-                        <div className="group cursor-pointer">
-                            <div className={`text-xl truncate py-2 text-center text-sm font-medium ${themeStyle.text} group-hover:text-pink-400 `}>
+                        <div className="group cursor-pointer" onClick={()=>router.push("/detail/" + movie.id)}>
+                            <div className={`text-xl truncate py-2 text-sm font-medium ${themeStyle.text} group-hover:text-pink-400 `}>
                                 {movie.title}
                             </div>
                             <div className="truncate text-xs text-tiny leading-tight text-gray-400 group-hover:text-pink-400">
@@ -106,7 +93,6 @@ export default function AppSlider(props: Props) {
                                     <StarIcon className="h-4 w-4 text-yellow-500" /> {movie.rating}
                                  </span>
                             }
-                            
                         </div>
                     </div>
                 </div>

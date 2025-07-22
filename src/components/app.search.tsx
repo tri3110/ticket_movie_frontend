@@ -1,9 +1,11 @@
 import { useDataStore } from "@/utils/store";
 import { MagnifyingGlassIcon, StarIcon } from "@heroicons/react/20/solid";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function AppSearch(){
+    const router = useRouter()
     const {t} = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [valueSearch, setValueSearch] = useState("");
@@ -43,7 +45,13 @@ export default function AppSearch(){
                         <div className="h-[400px] overflow-y-auto">
                         {
                             movies.map((movie)=> (
-                                <div key={movie.id} className="grid grid-cols-1 md:grid-cols-5 gap-2 p-2 cursor-pointer border-b border-gray-200">
+                                <div 
+                                    key={movie.id} 
+                                    onClick={()=> {
+                                        router.push("/detail/" + movie.id);
+                                        setIsOpen(false);
+                                    }} 
+                                    className="grid grid-cols-1 md:grid-cols-5 gap-2 p-2 cursor-pointer border-b border-gray-200">
                                     <div className="flex items-center">
                                         <img
                                         src={movie.poster_url}

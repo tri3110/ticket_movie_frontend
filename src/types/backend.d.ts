@@ -10,19 +10,45 @@ declare global {
         city: number;
     }
 
-    interface MovieSchedule{
+    interface Movie {
+        id: number;
+        title: string;
+        status: string;
+        duration: number;
+        poster_url: string;
+        rating: string;
+        movie_cast: string;
+        description: string;
+        director: string;
+        genre: string;
+        release_date: string;
+        trailer_url: string;
+    }
+
+    interface City {
+        id: number;
+        name: string;
+        country: string;
+    }
+
+    interface Showtimes {
         showtime_id: number,
-        movie_id: number,
-        movie_poster_url: string,
-        movie_title: string,
-        movie_genre: string,
         duration: string,
         start_time: string,
         end_time: string,
         base_price: number,
+    }
+
+    interface Screens{
         screen_id: number,
         screen_name: string,
         screen_type: string,
+        showtimes: Showtimes[]
+    }
+
+    interface MovieSchedule {
+        movie: Movie,
+        screens: Screens[],
     }
 
     interface SeatsScreen {
@@ -34,6 +60,7 @@ declare global {
         is_active: boolean,
         seat_name: string,
         seat_name_couple: string,
+        is_booking: boolean,
     }
 
     interface DataSeatsScreen{

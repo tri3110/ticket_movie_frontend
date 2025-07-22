@@ -1,18 +1,4 @@
 "use client";
-interface Movie {
-    id: number;
-    title: string;
-    status: string;
-    duration: number;
-    poster_url: string;
-    rating: string;
-    movie_cast: string;
-    description: string;
-    director: string;
-    genre: string;
-    release_date: string;
-    trailer_url: string;
-}
 
 interface Props {
   isOpen: boolean;

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useDataStore } from "@/utils/store";
 import dayjs from 'dayjs';
 import SeatDialog from "./app.seat.dialog";
+import { getTime } from "@/utils/common";
 
 type City = {
     id: number; 
@@ -51,7 +52,7 @@ export default function AppMovieSchedule () {
             const date = today.add(i, 'day');
             result.push({
                 day: date.date(),
-                weekday: i == 0 ? "To day" : date.format('dddd'),
+                weekday: i == 0 ? "Today" : date.format('dddd'),
                 fullDate: date.format('YYYY-MM-DD'), 
             });
         }
@@ -80,7 +81,6 @@ export default function AppMovieSchedule () {
 
                 const data = await response.json();
                 setMoviesSchedule(data);
-                console.log(data)
             } catch (error) {
                 console.error("Failed to fetch schedule:", error);
             }
@@ -89,17 +89,13 @@ export default function AppMovieSchedule () {
         fetchSchedule();
     }, [selectedCinema, selectedDay]);
 
-    const getTime = (dateStr:string) => {
-        const date = new Date(dateStr);
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        return hours + ":" + minutes;
-    }
-
-    const [selectMoviesSchedule, setSelectMoviesSchedule] = useState<MovieSchedule | null>();
+    const [selectScreen, setSelectScreen] = useState<Screens | null>();
+    const [selectShowtime, setSelectShowtime] = useState<Showtimes | null>();
+    const [selectMovie, setSelectMovie] = useState<Movie | null>();
     const [dataSeatsScreen, setdataSeatsScreen] = useState<DataSeatsScreen | null>();
+
     useEffect(()=>{
-        if (selectMoviesSchedule){
+        if (selectShowtime){
             const fetchScreenSeat = async () => {
                 const response = await fetch("http://127.0.0.1:8000/app/api/main/screen/seat/", {
                     method: "POST",
@@ -107,7 +103,8 @@ export default function AppMovieSchedule () {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        screen_id: selectMoviesSchedule.screen_id,
+                        screen_id: selectScreen?.screen_id,
+                        showtime_id: selectShowtime.showtime_id
                     }),
                 })
 
@@ -118,7 +115,7 @@ export default function AppMovieSchedule () {
             fetchScreenSeat();
         }
         
-    }, [selectMoviesSchedule])
+    }, [selectShowtime])
 
     const [showSeatDialog, setShowSeatDialog] = useState(false);
     const [showLoading, setShowLoading] = useState(false);
@@ -126,7 +123,7 @@ export default function AppMovieSchedule () {
     useEffect(() => {
         let timer: NodeJS.Timeout;
 
-        if (selectMoviesSchedule && dataSeatsScreen) {
+        if (selectShowtime && dataSeatsScreen) {
             setShowLoading(true); 
             setShowSeatDialog(false);
 
@@ -140,7 +137,7 @@ export default function AppMovieSchedule () {
         }
 
         return () => clearTimeout(timer);
-    }, [selectMoviesSchedule, dataSeatsScreen]);
+    }, [selectShowtime, dataSeatsScreen]);
 
     return (
         <div className="h-[700px] flex flex-col md:shadow-soju1 rounded-lg border-gray-200 bg-white md:overflow-hidden md:border">
@@ -266,7 +263,7 @@ export default function AppMovieSchedule () {
                                                 <div className={`${selectedDay == day.fullDate ? "bg-pink-600 text-white" : "bg-gray-100"} rounded-t-[5px] mx-auto py-1 text-center text-lg font-semibold`}>
                                                     {day.day}
                                                 </div>
-                                                <div className="mx-auto py-1 text-center text-sm">{t(day.weekday)}</div>
+                                                <div className="mx-auto py-1 text-center truncate text-sm">{t(day.weekday)}</div>
                                             </div>
                                         ))
                                     }
@@ -275,27 +272,42 @@ export default function AppMovieSchedule () {
                             <div className="flex-1 overflow-y-auto">
                                 {
                                     moviesSchedule.map((movieSchedule)=> (
-                                        <div key={movieSchedule.movie_id} className="grid grid-cols-1 md:grid-cols-5 gap-2 p-2 cursor-pointer border-b border-gray-200">
+                                        <div key={movieSchedule.movie.id} className="grid grid-cols-1 md:grid-cols-5 gap-2 p-2 cursor-pointer border-b border-gray-200">
                                             <div className="flex items-center">
                                                 <img
-                                                src={movieSchedule.movie_poster_url}
-                                                alt={movieSchedule.movie_title}
+                                                src={movieSchedule.movie.poster_url}
+                                                alt={movieSchedule.movie.title}
                                                 className="h-42 w-full object-cover rounded-md shadow-md"
                                                 />
                                             </div>
 
                                             <div className="md:col-span-4 space-y-2 ml-3">
-                                                <h2 className="font-semibold leading-tight text-pink-500">{movieSchedule.movie_title}</h2>
-                                                <p className="text-sm text-gray-400">{movieSchedule.movie_genre}</p>
-                                                <h2 className="pt-4 font-semibold leading-tight text-gray-700">{movieSchedule.screen_type}</h2>
-                                                <div className="pt-2 ">
-                                                    <button onClick={() => setSelectMoviesSchedule(movieSchedule)} 
-                                                    className="text-blue-600 hover:bg-blue-200 border border-blue-600 rounded-lg p-1 cursor-pointer">
-                                                        {
-                                                            getTime(movieSchedule.start_time) + " ~ " + getTime(movieSchedule.end_time)
-                                                        }
-                                                    </button>
-                                                </div>
+                                                <h2 className="font-semibold leading-tight text-pink-500">{movieSchedule.movie.title}</h2>
+                                                <p className="text-sm text-gray-400">{movieSchedule.movie.genre}</p>
+
+                                                {
+                                                    movieSchedule.screens.map((screen)=>(
+                                                        <div key={screen.screen_id} className="pt-2 ">
+                                                            <h2 className="font-semibold leading-tight">{screen.screen_type}</h2>
+                                                            <div className="pt-2 space-x-3">
+                                                            {
+                                                                screen.showtimes.map((showtimes)=>(
+                                                                    <button key={showtimes.showtime_id} onClick={() => {
+                                                                            setSelectShowtime(showtimes);
+                                                                            setSelectScreen(screen);
+                                                                            setSelectMovie(movieSchedule.movie);
+                                                                        }} 
+                                                                        className="text-blue-600 hover:bg-blue-200 border border-blue-600 rounded-lg p-1 cursor-pointer">
+                                                                        {
+                                                                            getTime(showtimes.start_time) + " ~ " + getTime(showtimes.end_time)
+                                                                        }
+                                                                    </button>
+                                                                ))
+                                                            }
+                                                            </div> 
+                                                        </div>
+                                                    ))
+                                                }
                                             </div>
                                         </div>
                                     ))
@@ -316,12 +328,14 @@ export default function AppMovieSchedule () {
                 </div>
             )}
             {
-                showSeatDialog && selectMoviesSchedule && dataSeatsScreen && selectedCinema && (
+                showSeatDialog && selectMovie && dataSeatsScreen && selectedCinema && selectScreen && selectShowtime &&(
                 <SeatDialog
-                    movieSchedule={selectMoviesSchedule}
-                    setSelectMoviesSchedule={setSelectMoviesSchedule}
+                    movie={selectMovie}
+                    setSelectShowtime={setSelectShowtime}
                     dataSeatsScreen={dataSeatsScreen}
                     cinema={selectedCinema}
+                    selectScreen={selectScreen}
+                    selectShowtime={selectShowtime}
                 />
             )}
         </div>

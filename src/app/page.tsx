@@ -18,6 +18,10 @@ export default function Home() {
   const { t } = useTranslation();
 
   const data = useDataStore((state) => state.data?.movies);
+  const {getFilteredMovieByStatus} = useDataStore();
+  const moviesShowing = getFilteredMovieByStatus("showing");
+  const moviesComing = getFilteredMovieByStatus("coming");
+
   if (data == null){
     return (
       <div>
@@ -36,13 +40,13 @@ export default function Home() {
         >
         <div className="px-4 max-w-screen-xl mx-auto text-white">
           <h2 className="text-3xl font-bold text-center pt-6">{ t("Now Showing") }</h2>
-          <AppSlider movies={data} themeStyle={themeStyle.Dark}/>
+          <AppSlider movies={moviesShowing} themeStyle={themeStyle.Dark}/>
         </div>
       </div>
       <div className='bg-pink-50'>
         <h2 className="px-4 py-3 max-w-screen-xl mx-auto text-3xl font-bold text-center text-red-600 pt-6">{ t("Coming Soon") }</h2>
         <div className="px-4 max-w-screen-xl mx-auto bg-white">
-          <AppSlider movies={data} themeStyle={themeStyle.Light}/>
+          <AppSlider movies={moviesComing} themeStyle={themeStyle.Light}/>
         </div>
       </div>
       <div className='bg-pink-50 pb-6'>
