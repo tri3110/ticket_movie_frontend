@@ -32,7 +32,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable}`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col`}
       >
         <SessionProvider>
           <ProviderContextApp>
