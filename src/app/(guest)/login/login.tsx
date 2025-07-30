@@ -48,7 +48,7 @@ export default function LoginForm() {
     else{
       const session = await getSession();
       if (session) {
-        router.push("/");
+        router.push("/home");
       } else {
         toast.error("Failed to retrieve session");
       }

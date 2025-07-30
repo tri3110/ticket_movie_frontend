@@ -88,11 +88,11 @@ const Header = () => {
                         )}
                     </button>
                     <div className="py-4 flex gap-6 items-center">
-                        <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">Logo</Link>
+                        <Link href="/home" className="text-xl font-bold text-gray-900 dark:text-white">Logo</Link>
                         <nav className="hidden md:flex gap-6">
-                            <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Home")}</Link>
-                            <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Film")}</Link>
-                            <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Cinema")}</Link>
+                            <Link href="/home" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Home")}</Link>
+                            <Link href="/home" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Film")}</Link>
+                            <Link href="/home" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Cinema")}</Link>
                         </nav>
                     </div>
                     <div className="flex items-center gap-1">
@@ -147,9 +147,9 @@ const Header = () => {
                 </header>
                 {mobileMenuOpen && (
                     <nav className="md:hidden flex flex-col gap-4 py-4">
-                        <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Home")}</Link>
-                        <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Film")}</Link>
-                        <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Cinema")}</Link>
+                        <Link href="/home" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Home")}</Link>
+                        <Link href="/home" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Film")}</Link>
+                        <Link href="/home" className="text-gray-700 dark:text-gray-300 hover:text-blue-500">{t("Cinema")}</Link>
                         <div className="flex justify-between items-center">
                             <div className="flex h-fit items-center border-1 border-gray-400 rounded-md overflow-hidden bg-white dark:bg-gray-800">
                                 <input

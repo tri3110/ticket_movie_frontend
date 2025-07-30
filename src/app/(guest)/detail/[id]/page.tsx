@@ -30,8 +30,8 @@ export default function MovieDetail({ params }: { params: Promise<{ id: string }
     return (
         <>
             <div className="flex items-center px-4 max-w-screen-xl mx-auto p-4">
-                <Link href={"/"} className="flex items-center"> <HomeIcon className="h-5 w-5 pd-1" /> <ChevronRightIcon className="h-5 w-5  text-gray-400" /></Link>
-                <Link href={"/"} className="flex items-center"> Phim chiếu <ChevronRightIcon className="h-5 w-5  text-gray-400" /></Link>
+                <Link href={"/home"} className="flex items-center"> <HomeIcon className="h-5 w-5 pd-1" /> <ChevronRightIcon className="h-5 w-5  text-gray-400" /></Link>
+                <Link href={"/home"} className="flex items-center"> Phim chiếu <ChevronRightIcon className="h-5 w-5  text-gray-400" /></Link>
                 <span className="text-gray-600">{movie.title}</span>
             </div>
             <div className="relative z-10 flex items-center justify-center bg-black py-4 text-white text-opacity-95 sm:py-6">

@@ -1,5 +1,4 @@
 import { useDataStore } from "@/utils/store";
-import { StarIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 
 export default function MovieShowing(){
