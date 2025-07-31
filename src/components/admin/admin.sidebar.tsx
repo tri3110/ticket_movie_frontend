@@ -3,8 +3,7 @@ import React, { useEffect, useRef, useState,useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useSidebar } from "../../context/sidebar.context";
-import SidebarWidget from "./admin.sidebar.widget";
+import { useSidebar } from "@/context/sidebar.context";
 import { 
   CalendarIcon,
   ChartPieIcon,
@@ -40,7 +39,7 @@ const navItems: NavItem[] = [
   {
     icon: <UserCircleIcon className="w-6 h-6"/>,
     name: "User Profile",
-    path: "/profile",
+    path: "/admin/profile",
   },
 
   {
@@ -315,14 +314,14 @@ const AppSidebar: React.FC = () => {
                 className="dark:hidden"
                 src="/images/1.png"
                 alt="Logo"
-                width={150}
+                width={80}
                 height={40}
               />
               <Image
                 className="hidden dark:block"
                 src="/images/1.png"
                 alt="Logo"
-                width={150}
+                width={80}
                 height={40}
               />
             </>
@@ -374,7 +373,6 @@ const AppSidebar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || <SidebarWidget/> ? null : null}
       </div>
     </aside>
   );

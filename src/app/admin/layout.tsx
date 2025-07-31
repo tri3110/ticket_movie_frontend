@@ -1,20 +1,28 @@
-import type { Metadata } from "next";
-import 'flag-icons/css/flag-icons.min.css';
-import AdminTemplate from "./page";
-import { SidebarProvider } from "@/context/sidebar.context";
+import { Outfit } from 'next/font/google';
+import './admin.css';
 
-export const metadata: Metadata = {
-  title: "Watch",
-  description: "Watch",
-};
+import { SidebarProvider } from '@/context/sidebar.context';
+import { ThemeProvider } from '@/context/ThemeContext';
+import AdminLayout from './admin.layout';
 
-export default async function RootLayout({
+const outfit = Outfit({
+  subsets: ["latin"],
+});
+
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
   return (
-    <AdminTemplate>{children}</AdminTemplate>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${outfit.className} dark:bg-gray-900`} suppressHydrationWarning>
+        <ThemeProvider>
+          <SidebarProvider>
+            <AdminLayout>{children}</AdminLayout>
+          </SidebarProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }
