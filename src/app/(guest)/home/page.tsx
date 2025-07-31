@@ -1,8 +1,8 @@
 'use client'
 
-import AppSlider from '@/components/app.movie.slider';
+import AppSlider from '@/components/guest/app.movie.slider';
 import { useTranslation } from 'react-i18next';
-import AppMovieSchedule from '@/components/app.movie.schedule';
+import AppMovieSchedule from '@/components/guest/app.movie.schedule';
 import { useDataStore } from '@/utils/store';
 
 const themeStyle = {

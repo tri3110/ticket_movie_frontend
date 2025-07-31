@@ -1,7 +1,7 @@
 'use client'
 
-import MovieDialog from "@/components/app.movie.dialog";
-import AppMovieSchedule from "@/components/app.movie.schedule";
+import MovieDialog from "@/components/guest/app.movie.dialog";
+import AppMovieSchedule from "@/components/guest/app.movie.schedule";
 import { useDataStore } from "@/utils/store";
 import { ChevronRightIcon, HomeIcon, StarIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
