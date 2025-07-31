@@ -3,7 +3,7 @@
 import HeaderAdmin from '@/components/admin/admin.header';
 import AppSidebar from '@/components/admin/admin.sidebar';
 import Backdrop from '@/components/admin/Backdrop';
-import { SidebarProvider, useSidebar } from '@/context/sidebar.context';
+import { useSidebar } from '@/context/sidebar.context';
 import 'flag-icons/css/flag-icons.min.css';
 
 export default function AdminLayout({children}: Readonly<{children: React.ReactNode;}>) {

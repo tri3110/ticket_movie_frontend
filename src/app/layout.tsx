@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import 'flag-icons/css/flag-icons.min.css';
-import GuestTemplate from "./(guest)/guest.layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +29,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col`}
       >
-        <GuestTemplate>{children}</GuestTemplate>
+        {children}
       </body>
     </html>
   );
