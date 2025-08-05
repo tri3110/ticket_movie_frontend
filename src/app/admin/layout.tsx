@@ -1,6 +1,5 @@
 import { Outfit } from 'next/font/google';
 import './admin.css';
-
 import { SidebarProvider } from '@/context/sidebar.context';
 import { ThemeProvider } from '@/context/ThemeContext';
 import AdminLayout from './admin.layout';

@@ -1,6 +1,12 @@
 export { };
 
 declare global {
+    
+    interface OptionType{ 
+        label: string; 
+        value: number 
+    };
+
     interface Cinema {
         id: number;
         name: string;
@@ -39,7 +45,15 @@ declare global {
         base_price: number,
     }
 
-    interface Screens{
+    interface ScreenType{
+        id: number,
+        name: string,
+        type: string,
+        capacity: number,
+        cinema: Cinema
+    }
+
+    interface ScreenShowTime{
         screen_id: number,
         screen_name: string,
         screen_type: string,
@@ -48,7 +62,7 @@ declare global {
 
     interface MovieSchedule {
         movie: Movie,
-        screens: Screens[],
+        screens: ScreenShowTime[],
     }
 
     interface SeatsScreen {

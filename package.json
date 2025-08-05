@@ -11,6 +11,9 @@
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
+    "ag-grid-community": "^34.1.0",
+    "ag-grid-enterprise": "^34.1.0",
+    "ag-grid-react": "^34.1.0",
     "dayjs": "^1.11.13",
     "flag-icons": "^7.5.0",
     "i18next": "^25.3.2",
@@ -24,6 +27,7 @@
     "react-dom": "^19.0.0",
     "react-i18next": "^15.6.0",
     "react-icons": "^5.5.0",
+    "react-select": "^5.10.2",
     "react-toastify": "^11.0.5",
     "swr": "^2.3.4",
     "tailwind-merge": "^3.3.1",

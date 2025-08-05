@@ -33,8 +33,8 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalendarIcon className="w-6 h-6"/>,
-    name: "Calendar",
-    path: "/calendar",
+    name: "Screens",
+    path: "/admin/screen",
   },
   {
     icon: <UserCircleIcon className="w-6 h-6"/>,

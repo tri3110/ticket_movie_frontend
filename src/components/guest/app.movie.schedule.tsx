@@ -7,12 +7,6 @@ import dayjs from 'dayjs';
 import SeatDialog from "./app.seat.dialog";
 import { getTime } from "@/utils/common";
 
-type City = {
-    id: number; 
-    name: string;
-    country: string;
-}
-
 export default function AppMovieSchedule () {
     const cities = useDataStore((state) => state.data?.cities ?? []);
     const [selectedCity, setSelectedCity] = useState<City | null>(cities[0]);
@@ -68,7 +62,7 @@ export default function AppMovieSchedule () {
             if (!selectedCinema || !selectedDay) return;
 
             try {
-                const response = await fetch("http://127.0.0.1:8000/app/api/main/movies/schedule/", {
+                const response = await fetch(process.env.NEXT_PUBLIC_HTTP_GUEST + "movies/schedule/", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -89,7 +83,7 @@ export default function AppMovieSchedule () {
         fetchSchedule();
     }, [selectedCinema, selectedDay]);
 
-    const [selectScreen, setSelectScreen] = useState<Screens | null>();
+    const [selectScreen, setSelectScreen] = useState<ScreenShowTime | null>();
     const [selectShowtime, setSelectShowtime] = useState<Showtimes | null>();
     const [selectMovie, setSelectMovie] = useState<Movie | null>();
     const [dataSeatsScreen, setdataSeatsScreen] = useState<DataSeatsScreen | null>();
@@ -97,7 +91,7 @@ export default function AppMovieSchedule () {
     useEffect(()=>{
         if (selectShowtime){
             const fetchScreenSeat = async () => {
-                const response = await fetch("http://127.0.0.1:8000/app/api/main/screen/seat/", {
+                const response = await fetch(process.env.NEXT_PUBLIC_HTTP_GUEST + "screen/seat/", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

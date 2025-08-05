@@ -9,7 +9,7 @@ interface Props {
   setSelectShowtime: (value: Showtimes| null) => void;
   movie: Movie;
   dataSeatsScreen: DataSeatsScreen;
-  selectScreen: Screens;
+  selectScreen: ScreenShowTime;
   selectShowtime: Showtimes;
   cinema: Cinema;
 }

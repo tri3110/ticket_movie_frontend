@@ -32,7 +32,7 @@ const Header = () => {
     }
 
     const { data, error, isLoading } = useSWR(
-        "http://127.0.0.1:8000/app/api/main/data/", 
+        process.env.NEXT_PUBLIC_HTTP_GUEST + "data/", 
         fetcher,
         {
             revalidateIfStale: false,

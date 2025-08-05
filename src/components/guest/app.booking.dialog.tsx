@@ -11,7 +11,7 @@ interface Props {
     totalPrice: number;
     bookingSeats: SeatsScreen[];
     setSelectShowtime: (value: Showtimes| null) => void;
-    selectScreen: Screens;
+    selectScreen: ScreenShowTime;
     selectShowtime: Showtimes;
 }
 
@@ -23,7 +23,7 @@ export default function BookingDialog(props: Props) {
         try {
             const seats = bookingSeats.map((seat) => seat.id);
             
-            const res = await fetch("http://127.0.0.1:8000/app/api/main/screen/seat/booking/", {
+            const res = await fetch(process.env.NEXT_PUBLIC_HTTP_GUEST + "screen/seat/booking/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
